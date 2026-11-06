@@ -4,6 +4,8 @@ Skills that make your AI agents brief you like a professional staff.
 
 ## BLUF: decisions, not essays
 
+See the [BLUF page](skills/bluf/README.md) for the demo and results.
+
 Your agent answers in its first line. When it needs you, it hands you the decision, its recommendation, and the exact word that approves it. Small choices take one line. Spending, sending, deleting, or anything you can't undo gets the full brief.
 
 **Before**
@@ -63,7 +65,7 @@ On Windows, use `uninstall.ps1`. It removes only the block it added; if you edit
 
 | Skill | What it does |
 | --- | --- |
-| `bluf` | Decision-ready answers: the answer first, decisions you can approve in one word, sized to the stakes. |
+| [`bluf`](skills/bluf/README.md) | Decisions, not essays: the answer first, decisions you approve in a word or two, sized to the stakes. |
 
 More skills are coming as we build them in public.
 

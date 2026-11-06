@@ -5,7 +5,7 @@
 # Your own global instructions still apply in both runs, so compare on and off, not agents.
 set -eu
 here="$(cd "$(dirname "$0")" && pwd)"; repo="$(dirname "$here")"
-out="$here/results/$(date -u +%Y%m%dT%H%MZ)"; mkdir -p "$out"
+out="${OUT:-$here/results/$(date -u +%Y%m%dT%H%MZ)}"; mkdir -p "$out"   # set OUT to resume a run
 agents="$*"; [ -n "$agents" ] || for a in claude codex pi; do command -v "$a" >/dev/null && agents="$agents $a"; done
 block="$(sed -n "/^cat > \"\$work\/new\" <<'BLOCK'$/,/^BLOCK$/p" "$repo/install.sh" | sed '1d;$d')"
 
@@ -20,6 +20,7 @@ ask() { # agent dir prompt outfile
 for agent in $agents; do (
   tail -n +2 "$here/prompts.tsv" | while IFS="$(printf '\t')" read -r id kind prompt; do
     for cond in off on; do
+      [ -s "$out/$agent.$cond.$id.txt" ] && continue   # already answered
       dir="$(mktemp -d)"
       if [ "$cond" = on ]; then
         printf '%s\n' "$block" > "$dir/CLAUDE.md"; cp "$dir/CLAUDE.md" "$dir/AGENTS.md"

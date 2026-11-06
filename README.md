@@ -8,6 +8,12 @@ Skills that make your AI agents brief you like a professional staff.
 curl -fsSL https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.sh | sh
 ```
 
+On Windows, in PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.ps1 | iex
+```
+
 Pick the skills and agents you want. BLUF turns on for Claude Code and Codex as soon as it is installed: the installer adds one marked line to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`.
 
 Prefer to do it by hand? `npx skills add mpiv-ai/skeleton-crew -g`, then type `/bluf` when you want it.

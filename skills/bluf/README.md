@@ -1,5 +1,7 @@
 # BLUF
 
+**BLUF** stands for *bottom line up front*: put the conclusion or the request first, then only the support the reader needs. Military and government writers use it so a busy reader can act after one line.
+
 Decisions, not essays. Your agent answers in its first line. When it needs you, it hands you the question, its recommendation, and the exact reply that approves it.
 
 ![BLUF demo: the same question to the same agent, without BLUF and with it](../../assets/bluf-demo.gif)

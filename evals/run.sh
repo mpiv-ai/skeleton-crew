@@ -35,3 +35,8 @@ for agent in $agents; do (
 done
 wait
 python3 "$here/score.py" "$out" "$here/prompts.tsv" | tee "$out/results.md"
+
+# Answers can mention the test machine. Flag them before you publish the results.
+if grep -l -i -F -e "$(hostname)" -e "$(id -un)" "$out"/*.txt 2>/dev/null; then
+  echo "Warning: the files above name this machine or user. Redact them before publishing."
+fi

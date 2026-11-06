@@ -20,3 +20,5 @@ Run `20261106T1834Z` on mpiv-hub (Linux), 2026-11-06: Claude Code, Codex and Pi,
 ## Limits
 
 Seven questions per agent is a smoke test, not a benchmark. The scorer checks format, not whether the advice is right.
+
+Two Claude Code answers named the test machine and its tools; those names are replaced with `[server]` and "a remote terminal". Nothing else in the answers was edited.

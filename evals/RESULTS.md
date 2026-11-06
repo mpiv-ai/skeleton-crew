@@ -12,7 +12,7 @@ After the first run, the instructions block now says that anything the agent nee
 
 ## First run
 
-Run `20261106T1834Z` on mpiv-hub (Linux), 2026-11-06: Claude Code, Codex and Pi, seven questions each, BLUF off and on. Answers are in `evals/results/20261106T1834Z/`.
+Run `20261106T1834Z` on a Linux test machine, 2026-11-06: Claude Code, Codex and Pi, seven questions each, BLUF off and on. Raw answers are kept private because they can include the tester's own setup.
 
 | Agent | BLUF | Answered | First line is BLUF: | Decision has a Reply | Under 15 lines | No filler | Median lines |
 |---|---|---|---|---|---|---|---|
@@ -27,10 +27,8 @@ Run `20261106T1834Z` on mpiv-hub (Linux), 2026-11-06: Claude Code, Codex and Pi,
 
 - **Answer first works everywhere.** With BLUF on, all 21 answers opened with `BLUF:`. With it off, none did.
 - **Decision-ready works in Claude Code only.** Claude Code ended all three decision questions with numbered questions and a one-word reply. Codex and Pi led with the answer but stated what they needed as prose, with no reply to approve. The next release makes that format explicit and reruns this test.
-- **Length is not a fair test here.** This machine's agents already carry the tester's own global instructions, which ask for short answers, so "off" is already short. The one Claude Code "off" answer with a reply also comes from those instructions. Run `evals/run.sh` on a clean machine for a true baseline.
+- **Length is not a fair test here.** This machine's agents already carry the tester's own global instructions, which ask for short answers, so "off" is already short.  Run `evals/run.sh` on a clean machine for a true baseline.
 
 ## Limits
 
 Seven questions per agent is a smoke test, not a benchmark. The scorer checks format, not whether the advice is right.
-
-Two Claude Code answers named the test machine and its tools; those names are replaced with `[server]` and "a remote terminal". Nothing else in the answers was edited.

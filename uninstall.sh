@@ -11,14 +11,34 @@ trap 'rm -rf "$work"' EXIT
 cat > "$work/new" <<'BLOCK'
 <!-- skeleton-crew:bluf -->
 ## BLUF (from skeleton-crew)
+Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
+Bring decisions, not essays: each one is a numbered question with your recommendation, what happens if they agree, and the exact reply that approves it. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.
+After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.
+Separate what you verified from what you infer. Bad news goes in the first line.
+"BLUF:" marks the answer only; progress notes while you work are one plain line without it.
+The bluf skill has the full rules; load it when a reply involves a decision.
+<!-- /skeleton-crew:bluf -->
+BLOCK
+# Every block any release has added, so reinstall and uninstall recognise them. Blocks are separated by %%.
+cat > "$work/known" <<'BLOCK'
+<!-- skeleton-crew:bluf -->
+## BLUF (from skeleton-crew)
+Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
+Bring decisions, not essays: each one is a numbered question with your recommendation, what happens if they agree, and the exact reply that approves it. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.
+After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.
+Separate what you verified from what you infer. Bad news goes in the first line.
+"BLUF:" marks the answer only; progress notes while you work are one plain line without it.
+The bluf skill has the full rules; load it when a reply involves a decision.
+<!-- /skeleton-crew:bluf -->
+%%
+<!-- skeleton-crew:bluf -->
+## BLUF (from skeleton-crew)
 Start every reply with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
 After it, only what the reader needs: decisions as numbered questions with your recommendation and the exact reply that approves it; up to three "Why:" facts; "Next:" who acts next.
 Keep most replies to about 12 lines. Separate what you verified from what you infer. Bad news goes in the first line.
 The bluf skill has the full rules; load it when a reply involves a decision.
 <!-- /skeleton-crew:bluf -->
-BLOCK
-# Earlier releases added this one-line block; it is replaced on reinstall.
-cat > "$work/old" <<'BLOCK'
+%%
 <!-- skeleton-crew:bluf -->
 Always follow the bluf skill for every reply.
 <!-- /skeleton-crew:bluf -->
@@ -26,19 +46,20 @@ BLOCK
 
 # Print $1 without any exact skeleton-crew block. Exit 2 if a marker is present but the block was edited.
 strip_block() {
-  awk -v nf="$work/new" -v of="$work/old" '
+  awk -v kf="$work/known" '
     BEGIN {
-      while ((getline l < nf) > 0) nb[++nn] = l
-      while ((getline l < of) > 0) ob[++on] = l
+      nk = 1
+      while ((getline l < kf) > 0) { if (l == "%%") { nk++; continue }; kb[nk, ++kn[nk]] = l }
+      first = kb[1, 1]; last = kb[1, kn[1]]
     }
     { a[NR] = $0 }
-    function match_at(i, b, n,   k) { for (k = 1; k <= n; k++) if (a[i+k-1] != b[k]) return 0; return 1 }
+    function match_at(i, b,   k) { for (k = 1; k <= kn[b]; k++) if (a[i+k-1] != kb[b, k]) return 0; return 1 }
     END {
       for (i = 1; i <= NR; i++) {
         n = 0
-        if (match_at(i, nb, nn)) n = nn; else if (match_at(i, ob, on)) n = on
+        for (b = 1; b <= nk && !n; b++) if (match_at(i, b)) n = kn[b]
         if (n) { if (out > 0 && kept[out] == "") out--; i += n - 1; continue }
-        if (a[i] == nb[1] || a[i] == nb[nn]) exit 2
+        if (a[i] == first || a[i] == last) exit 2
         kept[++out] = a[i]
       }
       for (j = 1; j <= out; j++) print kept[j]

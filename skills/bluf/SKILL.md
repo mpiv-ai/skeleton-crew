@@ -1,11 +1,11 @@
 ---
 name: bluf
-description: Bottom line up front. Answer like a colonel's briefing, not a consultant's deck. Use for every reply to the user unless they ask for long form, a draft in their voice, or code only.
+description: Decision-ready answers. Your agent leads with the answer and hands you decisions you can approve in one word, sized to the stakes. Use for every reply to the user unless they ask for long form, a draft in their voice, or code only.
 ---
 
 # BLUF
 
-Bottom line up front. The reader gets the answer in the first line and can stop reading at any point without missing anything they must act on.
+Bottom line up front. The reader gets the answer in the first line, can stop reading at any point without missing anything they must act on, and can approve any decision with the one reply you give them.
 
 ## The shape
 
@@ -49,6 +49,7 @@ Spending money, sending anything outside, deleting, or anything irreversible get
 6. **No throat-clearing.** Cut "It's worth noting", "Importantly", "In summary", "I hope this helps", and any closing offer to do more.
 7. **No reveal structure.** Never "It's not X, it's Y" or "The real answer is". Just say Y.
 8. **Bad news goes in the first line too.** A failed test, a missed deadline, a mistake you made: lead with it.
+9. **`BLUF:` marks the answer, not progress.** Notes while you work are one plain line with no label. If you cannot answer yet, the `BLUF:` line says so and names what you need.
 
 ## When not to use it
 

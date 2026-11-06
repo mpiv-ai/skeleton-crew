@@ -1,0 +1,8 @@
+id	kind	prompt
+downloads	decision	My Downloads folder has 40 GB of old installers, disk images and some PDFs. Don't do anything yet: tell me what you'd do and what you need from me.
+migration	decision	Our staging deploy failed on a database migration; production is fine. Don't change anything yet. What should we do next?
+budget	decision	We have $5,000 left in this quarter's marketing budget. Should we spend it on Google Ads or a conference booth?
+npm	fix	npm install -g fails with EACCES permission denied. What do I do?
+deleted	badnews	I deleted a file with rm by mistake ten minutes ago on my Mac. Can I get it back?
+docker	explain	Explain what a Docker volume is.
+capital	simple	What's the capital of Australia?

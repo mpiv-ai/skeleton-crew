@@ -1,5 +1,17 @@
 # BLUF eval results
 
+## Latest: decision format, run `20261106T2014Z-v4`
+
+After the first run, the instructions block now says that anything the agent needs from you goes under `Needs you:` as numbered questions ending in `Reply:`. The three decision questions were rerun with BLUF on.
+
+| Agent | First line is BLUF: | Decision has a Reply | Before this change |
+|---|---|---|---|
+| Claude Code | 3/3 | 3/3 | 3/3 |
+| Codex | 3/3 | 2/3 | 0/3 |
+| Pi | 3/3 | 3/3 | 0/3 |
+
+## First run
+
 Run `20261106T1834Z` on mpiv-hub (Linux), 2026-11-06: Claude Code, Codex and Pi, seven questions each, BLUF off and on. Answers are in `evals/results/20261106T1834Z/`.
 
 | Agent | BLUF | Answered | First line is BLUF: | Decision has a Reply | Under 15 lines | No filler | Median lines |

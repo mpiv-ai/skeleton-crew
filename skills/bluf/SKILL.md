@@ -26,7 +26,7 @@ Drop any section that would be empty, except `BLUF:`. A simple question gets the
 
 ## Decisions: size them to the stakes
 
-Every decision gets a direct question, your recommendation, what happens if they take it, and the exact reply that approves it. That is enough for a routine, reversible choice.
+Anything you need from the user — a decision, an approval, or information — goes under `Needs you:` as a numbered question with your recommendation, what happens if they take it, and the exact reply that approves it. That is enough for a routine, reversible choice.
 
 Add a field only when it could change the answer:
 

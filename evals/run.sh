@@ -19,7 +19,8 @@ ask() { # agent dir prompt outfile
 
 for agent in $agents; do (
   tail -n +2 "$here/prompts.tsv" | while IFS="$(printf '\t')" read -r id kind prompt; do
-    for cond in off on; do
+    case " ${ONLY:-$id} " in *" $id "*) ;; *) continue ;; esac   # ONLY="id1 id2" limits prompts
+    for cond in ${CONDS:-off on}; do
       [ -s "$out/$agent.$cond.$id.txt" ] && continue   # already answered
       dir="$(mktemp -d)"
       if [ "$cond" = on ]; then

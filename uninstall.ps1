@@ -8,6 +8,17 @@ $NewBlock = @(
   '<!-- skeleton-crew:bluf -->'
   '## BLUF (from skeleton-crew)'
   'Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.'
+  'Bring decisions, not essays. Anything you need from the user (a decision, an approval, or information) goes under "Needs you:" as numbered questions; each gives your recommendation and what happens if they agree, and ends with Reply: `<exact words>`. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.'
+  'After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.'
+  'Separate what you verified from what you infer. Bad news goes in the first line.'
+  '"BLUF:" marks the answer only; progress notes while you work are one plain line without it.'
+  'The bluf skill has the full rules; load it when a reply involves a decision.'
+  '<!-- /skeleton-crew:bluf -->'
+)
+$Block3 = @(
+  '<!-- skeleton-crew:bluf -->'
+  '## BLUF (from skeleton-crew)'
+  'Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.'
   'Bring decisions, not essays: each one is a numbered question with your recommendation, what happens if they agree, and the exact reply that approves it. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.'
   'After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.'
   'Separate what you verified from what you infer. Bad news goes in the first line.'
@@ -46,7 +57,7 @@ function Remove-Block([string]$File) {
   $kept = New-Object System.Collections.Generic.List[string]
   for ($i = 0; $i -lt $lines.Count; $i++) {
     $n = 0
-    foreach ($kb in @($NewBlock, $Block2, $Block1)) { if ($n -eq 0 -and (Test-BlockAt $lines $i $kb)) { $n = $kb.Count } }
+    foreach ($kb in @($NewBlock, $Block3, $Block2, $Block1)) { if ($n -eq 0 -and (Test-BlockAt $lines $i $kb)) { $n = $kb.Count } }
     if ($n -gt 0) {
       if ($kept.Count -gt 0 -and $kept[$kept.Count - 1] -eq '') { $kept.RemoveAt($kept.Count - 1) }
       $i += $n - 1; continue

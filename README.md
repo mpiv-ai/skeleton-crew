@@ -69,6 +69,7 @@ On Windows, use `uninstall.ps1`. It removes only the blocks it added; if you edi
 | --- | --- |
 | [`skeleton-crew`](skills/skeleton-crew/README.md) | What skeleton-crew is, who makes it, which skills you have, and how to look after them. |
 | [`setup`](skills/setup/README.md) | From nothing to a working agent: pick, install, sign in and check, one step at a time. |
+| [`crew`](skills/crew/README.md) | A consultant's intake interview that designs your crew of agents and writes it to files you own. |
 | [`heartbeat`](skills/heartbeat/README.md) | Never wait blind: every wait bounded, checked and reported. |
 | [`receipts`](skills/receipts/README.md) | No "done" without where it is and its exact state. |
 | [`bluf`](skills/bluf/README.md) | Decisions, not essays: the answer first, decisions you approve in a word or two, sized to the stakes. |

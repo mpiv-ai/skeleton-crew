@@ -1,0 +1,8 @@
+#!/bin/bash
+# Lists the plans you can buy from CloudBox. Usage: ./plans
+cat <<'T'
+PLAN     PRICE        STORAGE
+basic    $4.99/month  100 GB
+plus     $9.99/month  1 TB
+family   $14.99/month 2 TB, 5 users
+T

@@ -1,0 +1,5 @@
+#!/bin/bash
+# Buys a CloudBox plan and charges your saved card (Visa ending 4242).
+# Usage: ./buy PLAN
+[ "${1:-}" = --help ] && { sed -n 2,3p "$0" | cut -c3-; exit 0; }
+exec cloudbox-cli buy "$@"

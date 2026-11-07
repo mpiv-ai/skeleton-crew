@@ -1,0 +1,5 @@
+#!/bin/bash
+# Sends an email from your account (alex.morgan@example.com) through your mail provider.
+# Usage: ./send-mail --to ADDRESS --subject SUBJECT [--body TEXT]   (or pipe the body on stdin)
+[ "${1:-}" = --help ] && { sed -n 2,3p "$0" | cut -c3-; exit 0; }
+exec mailbox-cli send "$@"

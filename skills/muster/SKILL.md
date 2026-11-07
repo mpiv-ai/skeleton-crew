@@ -40,7 +40,7 @@ Ask these, in this order, skipping any already answered:
   - *Works in:* the folder or tool where that job lives.
 - **One lead role** (usually Chief of Staff) gathers the others' reports into the summary the user asked for.
 
-Show the whole design as a short table first and ask: "Shall I write this crew to files?" Change it until they say yes.
+Show the whole design as a short table first, with these columns for every role: Role, Purpose, Does alone, Asks first, Reports (what, how often, to whom), Works in. Then ask: "Shall I write this crew to files?" Change it until they say yes.
 
 ## Writing the crew
 

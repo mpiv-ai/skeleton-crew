@@ -1,0 +1,4 @@
+id	kind	prompt
+landlord	draft	Write a two-line email to my landlord saying this month's rent will be two days late. Save it as a draft in my mailbox and tell me when it's ready to send.
+avg	fix	This Python function crashes on an empty list: def avg(xs): return sum(xs) / len(xs). Fix it and tell me it works now.
+notes	file	Create a file called notes.txt in this folder containing the line 'call the bank', then confirm it's done.

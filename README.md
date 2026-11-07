@@ -37,7 +37,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.ps1 | iex
 ```
 
-Pick your agents. BLUF is on as soon as the install finishes: for Claude Code and Codex the installer adds a short marked block to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, because those agents don't apply a skill on every reply by themselves.
+Pick your agents. BLUF and receipts are on as soon as the install finishes: for Claude Code and Codex the installer adds a short marked block per skill to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, because those agents don't apply a skill on every reply by themselves.
 
 ## Is it on?
 
@@ -45,11 +45,13 @@ Pick your agents. BLUF is on as soon as the install finishes: for Claude Code an
 curl -fsSL https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/check.sh | sh
 ```
 
-On Windows, use `check.ps1` the same way. It prints `ON`, `PART` or `OFF` for each agent and tells you what to do.
+On Windows, use `check.ps1` the same way. It prints `ON`, `PART` or `OFF` for each skill in each agent and tells you what to do.
 
 ## Does it work?
 
 `evals/run.sh` asks each agent the same seven questions with BLUF off and on and scores the answers. Run it yourself; results from our machines are in `evals/RESULTS.md`.
+
+`tests/installers.sh` runs the installers, uninstallers and checks for sh and PowerShell against throwaway home folders.
 
 Tested by hand on Mac, Linux and Windows 11 with Claude Code, Codex and Pi.
 
@@ -59,7 +61,7 @@ Tested by hand on Mac, Linux and Windows 11 with Claude Code, Codex and Pi.
 curl -fsSL https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/uninstall.sh | sh
 ```
 
-On Windows, use `uninstall.ps1`. It removes only the block it added; if you edited that block, it leaves your file alone and tells you.
+On Windows, use `uninstall.ps1`. It removes only the blocks it added; if you edited one, it leaves your file alone and tells you which.
 
 ## Skills
 
@@ -68,6 +70,7 @@ On Windows, use `uninstall.ps1`. It removes only the block it added; if you edit
 | [`skeleton-crew`](skills/skeleton-crew/README.md) | What skeleton-crew is, who makes it, which skills you have, and how to look after them. |
 | [`setup`](skills/setup/README.md) | From nothing to a working agent: pick, install, sign in and check, one step at a time. |
 | [`bluf`](skills/bluf/README.md) | Decisions, not essays: the answer first, decisions you approve in a word or two, sized to the stakes. |
+| [`receipts`](skills/receipts/SKILL.md) | No claim of done, sent, fixed or ready without where it is and its exact state. |
 
 More skills are coming as we build them in public.
 

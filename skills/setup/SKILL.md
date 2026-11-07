@@ -9,6 +9,8 @@ Get a newcomer from nothing to a working agent in one sitting, without making th
 
 ## Words to use
 
+- **skeleton-crew:** a free set of skills that make agents brief you like a professional staff. Its first skill, BLUF, puts the answer first and turns every ask into a decision you can approve in a word or two.
+
 Use these three terms, and define each the first time it comes up:
 
 - **Lab agent:** made by an AI lab. One account with that lab gives you the agent and the lab's models. Claude Code (Anthropic), Codex (OpenAI), Grok (xAI), Antigravity CLI (Google).
@@ -23,7 +25,7 @@ Never ask what you can find out. If you can run commands, check first, quietly, 
 
 - **System:** you already know it from your environment.
 - **Agents installed:** look for `claude`, `codex`, `grok`, `agy`, `pi`, `omp` and `bb` (`command -v` on Mac or Linux, `Get-Command` on Windows).
-- **skeleton-crew:** run the check script (step 4) and read its result.
+- **skeleton-crew:** if you are reading this skill from the user's own computer, skeleton-crew is already installed. To see which agents have BLUF on, look for the `bluf` skill in `~/.claude/skills/bluf` (Claude Code) and `~/.agents/skills/bluf` (Codex, Pi), and for the `<!-- skeleton-crew:bluf -->` block in `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. Do not look for a folder named skeleton-crew; there isn't one.
 - **You are one of the agents.** If you are running inside Claude Code, Codex or another agent, the user already has that lab's account and a terminal. Do not ask whether they pay for it or can use a terminal.
 
 Then ask only what is still unknown, one question at a time. Usually that is one question: what do they want next (another lab agent, an independent agent, skeleton-crew, or nothing)?

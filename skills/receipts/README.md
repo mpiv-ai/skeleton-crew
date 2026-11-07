@@ -11,7 +11,7 @@ No claim without a receipt. When your agent says something is done, saved, sent,
 
 ## Does it work?
 
-See [evals/receipts/RESULTS.md](../../evals/receipts/RESULTS.md). Early prompts were too easy; a harder set is coming.
+See [evals/receipts/RESULTS.md](../../evals/receipts/RESULTS.md). A real-work test shows it catches "fixed" claims made without testing.
 
 ## Install
 

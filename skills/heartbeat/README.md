@@ -12,7 +12,7 @@ Never wait blind. Long work fails quietly: a build dies, a test run stops, an ag
 
 ## Does it work?
 
-See [evals/heartbeat/RESULTS.md](../../evals/heartbeat/RESULTS.md). In a real-work test with a job that hangs, Claude Code and Pi never reported the stall without heartbeat; with it, both said the job was stuck.
+See [evals/heartbeat/RESULTS.md](../../evals/heartbeat/RESULTS.md). In a real-work test with a job that hangs, Claude Code and Pi never reported the stall without heartbeat. With it, Claude Code reported the stall every time; Pi did in 3 of 4 runs.
 
 ## Install
 

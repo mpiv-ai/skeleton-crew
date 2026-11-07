@@ -1,5 +1,24 @@
 # Heartbeat eval results
 
+## Rerun with the revised block, 2026-11-07
+
+After the first test, the skill gained two rules: **bound the wait, not the work** (never kill a job for being slow, only for not progressing) and **check on a timer** (a watch that speaks only on new output is silent during a stall). Same test, same matrix, block from commit `589f967`. The heartbeat-off runs are unchanged and gave the same results as before.
+
+| Agent | Task | Previous block | Revised block |
+|---|---|---|---|
+| Claude Code | slow | Correct; longest blind wait 61 s | Correct; longest blind wait 45 s; 4 progress reports |
+| Claude Code | stall | Said it stalled, after a 298 s blind wait | Said it stalled and stopped the job; longest blind wait 40 s, answer at 137 s |
+| Pi | slow | 1 of 2 correct; waits capped at 90–110 s | 0 of 2 correct: both put a 110 s timeout on the job, killing it at step 6, then said they could not confirm it finished |
+| Pi | stall | 2 of 2 said it was stuck (waits 100–110 s) | 1 of 2 said it was stuck (110 s); the other ran the job with no timeout and was still waiting at the 7-minute limit |
+
+What changed:
+
+- **Claude Code now checks on a timer.** On the stall, its longest silence fell from 298 s to 40 s, and it reported the stall after about 2 minutes instead of 5.
+- **Pi got worse.** With the revised block, every Pi run first tried to start the job in the background through a `nohup bash -c` wrapper that records the exit code. The test's shell filter allows only `./job.sh` and `sleep`, so it refused the wrapper. (In the previous round Pi used the plain `./job.sh > job.log 2>&1 &`, which the filter allows.) Pi then ran the job in the foreground. Three times it set a 110 s timeout, which kills the job, breaking "bound the wait, not the work". Once it set no timeout and blocked for 403 s, breaking "never block more than two minutes".
+- **The gap left:** the block does not say what to do when background running fails. A next rule could be: if you cannot run it in the background, say so, and do not run it in the foreground for longer than two minutes. Part of Pi's result comes from this test's narrow shell; with full shell access its wrapper would probably have worked (not tested).
+
+This is still a small sample: one run per case for Claude Code, two for Pi.
+
 ## Real-work test, 2026-11-07
 
 Each agent was asked: "Run ./job.sh and tell me when it finishes." The job prints a step every 20 seconds and finishes after 3 minutes. In the **stall** case, the same script hangs after step 1 because another process holds its lock. The agent sees the same script and request in both cases. Each agent ran with heartbeat off (an empty folder) and on (the heartbeat block and skill in the project folder), in a throwaway folder with its own process list and its own `/tmp`. Its shell was limited to `./job.sh` and `sleep`. Each run had 7 minutes. Claude Code ran once per case, Pi twice. Raw answers are kept private.

@@ -39,14 +39,12 @@ run() { # agent cond task rep
       -e "$here/gate.ts" -t read,bash "${on[@]}" "$ask" < /dev/null 2>&1 | python3 "$here/stamp.py" > "$f.jsonl")
   fi
   rc=$?
-  # What really happened: how long the run took, whether it was cut off, what was left running.
-  left=0
+  # What really happened: how long the run took and whether the time limit cut it off.
+  # The sandbox ends the job with the agent; this also stops the lock holder.
   for p in /proc/[0-9]*; do
-    [ "$(readlink "$p/cwd" 2>/dev/null)" = "$d" ] || continue
-    grep -qa job.sh "$p/cmdline" 2>/dev/null && left=1
-    kill "${p#/proc/}" 2>/dev/null
+    [ "$(readlink "$p/cwd" 2>/dev/null)" = "$d" ] && kill "${p#/proc/}" 2>/dev/null
   done
-  printf '{"seconds": %s, "exit": %s, "left_running": %s}\n' "$(( $(date +%s) - t0 ))" "$rc" "$left" > "$f.truth.json"
+  printf '{"seconds": %s, "exit": %s}\n' "$(( $(date +%s) - t0 ))" "$rc" > "$f.truth.json"
   rm -rf "$d"
 }
 

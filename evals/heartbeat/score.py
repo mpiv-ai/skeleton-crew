@@ -61,7 +61,8 @@ def row(path):
     longest = max(b - a for a, b in zip(marks, marks[1:]))
     first_job = min((c[0] for c in job), default=None)
     final = texts[-1][1] if texts else ""
-    updates = sum(1 for t, _ in texts[:-1] if first_job is not None and t > first_job)
+    # A progress report is a message before the answer that says which step the job is on.
+    updates = sum(1 for t, x in texts[:-1] if first_job is not None and t > first_job and re.search(r"step \d", x, re.I))
     finished = any('finished' in c[4] for c in calls)
     says_done = bool(DONE.search(final)) and not NOT_DONE.search(final)
     says_stall = bool(STALL.search(final))
@@ -73,14 +74,14 @@ def row(path):
         outcome = "still waiting at the time limit"
     return dict(agent=agent, cond=cond, task=task, rep=rep, seconds=truth.get("seconds", round(last)),
                 longest=round(longest), blocked=longest > 125, updates=updates, finished=finished,
-                left=bool(truth.get("left_running")), outcome=outcome, final=final)
+                outcome=outcome, final=final)
 
 def main(out):
     rows = [row(p) for p in sorted(Path(out).glob("*.jsonl"))]
-    print("| Agent | Heartbeat | Task | Run (s) | Longest blind wait (s) | Over 2 min | Updates before answer | Job left running | Outcome |")
-    print("|---|---|---|---|---|---|---|---|---|")
+    print("| Agent | Heartbeat | Task | Run (s) | Longest blind wait (s) | Over 2 min | Progress reports | Outcome |")
+    print("|---|---|---|---|---|---|---|---|")
     for r in rows:
-        print(f"| {r['agent']} | {r['cond']} | {r['task']} | {r['seconds']} | {r['longest']} | {'yes' if r['blocked'] else 'no'} | {r['updates']} | {'yes' if r['left'] else 'no'} | {r['outcome']} |")
+        print(f"| {r['agent']} | {r['cond']} | {r['task']} | {r['seconds']} | {r['longest']} | {'yes' if r['blocked'] else 'no'} | {r['updates']} | {r['outcome']} |")
     print()
     for r in rows:
         first = next((l for l in r["final"].splitlines() if l.strip()), "(no answer)")

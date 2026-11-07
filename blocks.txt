@@ -1,3 +1,4 @@
 # Skills that add a block to each agent's global instructions, in the order the blocks appear.
 # Each one keeps its block in skills/<name>/block.md and every earlier version in skills/<name>/block.previous.md.
 bluf
+receipts

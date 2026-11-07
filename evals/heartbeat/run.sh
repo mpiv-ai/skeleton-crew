@@ -6,8 +6,8 @@
 # The agent sees the same script and the same request either way.
 # The shell is limited to ./job.sh and sleep: Claude Code by --allowedTools, Pi by gate.ts.
 # Our own global instructions, hooks, extensions and skills are switched off.
-# Each agent runs in its own process namespace (bubblewrap), so it cannot see the other runs
-# or this script in the process list. The lock holder stays outside, as an unknown process would.
+# Each agent runs in its own process namespace with its own /tmp (bubblewrap), so it cannot
+# see the other runs, their files, or this script in the process list. The lock holder stays outside, as an unknown process would.
 # Needs bwrap (bubblewrap). Usage: evals/heartbeat/run.sh [claude] [pi]    (OUT=dir to resume, LIMIT=seconds per run, REPS=n)
 set -u
 here=$(cd "$(dirname "$0")" && pwd); repo=$(cd "$here/../.." && pwd)
@@ -24,7 +24,7 @@ run() { # agent cond task rep
     cp "$block" "$d/CLAUDE.md"; cp "$block" "$d/AGENTS.md"
     mkdir -p "$d/.claude/skills"; cp -r "$repo/skills/heartbeat" "$d/.claude/skills/"
   fi
-  box=(bwrap --dev-bind / / --unshare-pid --proc /proc --die-with-parent)
+  box=(bwrap --dev-bind / / --tmpfs /tmp --bind "$d" "$d" --unshare-pid --proc /proc --die-with-parent)
   t0=$(date +%s)
   if [ "$1" = claude ]; then
     (set -o pipefail; cd "$d" && env -u BB_THREAD_ID -u BB_THREAD_STORAGE -u BB_FOLD_UNATTENDED \

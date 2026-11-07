@@ -1,5 +1,30 @@
 # Heartbeat eval results
 
+## Pi rerun: no timeouts on the job, and a realistic shell, 2026-11-07
+
+The block gained a third rule (commit `2b1a931`): never wrap the job in a timeout; if it cannot go to the background, say so and ask; never run it in the foreground for more than two minutes. Pi only, heartbeat on, both tasks, two runs each, in two shells:
+
+- **Restricted:** the same shell as before, `./job.sh` and `sleep` only.
+- **Realistic:** what a real user has for background work: `nohup`, `setsid`, `bash -c`, `&`, variables, and the commands to check on a job (`mktemp`, `mkdir`, `cat`, `tail`, `ls`, `ps`, `jobs`, `kill`), with `./job.sh` the only real program. To keep it safe, the filesystem is read-only outside the run's folder and `/tmp`, and `kill` reaches only the run's own processes.
+
+| Shell | Task | Run | Longest blind wait | Timeout on the job | What it told the user |
+|---|---|---|---|---|---|
+| Restricted | slow | 1 | 180 s | no | Finished. Correct, but it ran the job in the foreground for 3 minutes after its background command was refused. |
+| Restricted | slow | 2 | 9 s | no | Asked: "this environment blocks background execution. May I run it in the foreground despite the two-minute monitoring limit?" |
+| Restricted | stall | 1 | 60 s | no | Stuck at step 1 after two 60 s checks; it stopped watching and said so. |
+| Restricted | stall | 2 | 21 s | no | Started it, but could not check on it (`jobs` refused), and said it could not confirm completion. |
+| Realistic | slow | 1 | 25 s | no | Finished. Correct; 7 progress reports. |
+| Realistic | slow | 2 | 30 s | no | Finished. Correct; 5 progress reports. |
+| Realistic | stall | 1 | 30 s | no | Stuck at step 1 after two checks, at 160 s; it left the job running and said so. |
+| Realistic | stall | 2 | 30 s | no | Stuck at step 1 after two checks; it stopped the job and said so, at 106 s. |
+
+What changed:
+
+- **No Pi run put a timeout on the job**, against 3 of 4 runs with the previous block.
+- **With a realistic shell, Pi followed every rule in all four runs.** It started the job in the background, checked every 10–30 s, gave a progress line at each check, reported the finish correctly, and reported each stall within about 2.5 minutes.
+- **The restricted shell still trips it.** In one run Pi asked before running in the foreground, as the new rule says. In another it ran in the foreground for 3 minutes without asking, which breaks the rule; the answer was still correct.
+- A first try at the realistic shell left out `mktemp`, which Pi's background command uses, so all four runs were refused it. Those runs were thrown away and are not counted.
+
 ## Rerun with the revised block, 2026-11-07
 
 After the first test, the skill gained two rules: **bound the wait, not the work** (never kill a job for being slow, only for not progressing) and **check on a timer** (a watch that speaks only on new output is silent during a stall). Same test, same matrix, block from commit `589f967`. The heartbeat-off runs are unchanged and gave the same results as before.

@@ -37,7 +37,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.ps1 | iex
 ```
 
-Pick your agents. BLUF, receipts and heartbeat are on as soon as the install finishes: for Claude Code and Codex the installer adds a short marked block per skill to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, because those agents don't apply a skill on every reply by themselves.
+Pick your agents. BLUF, receipts, heartbeat and chaperone are on as soon as the install finishes: for Claude Code and Codex the installer adds a short marked block per skill to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, because those agents don't apply a skill on every reply by themselves.
 
 ## Is it on?
 
@@ -71,6 +71,7 @@ On Windows, use `uninstall.ps1`. It removes only the blocks it added; if you edi
 | [`setup`](skills/setup/README.md) | From nothing to a working agent: pick, install, sign in and check, one step at a time. |
 | [`muster`](skills/muster/README.md) | Muster your crew: a consultant's intake interview that designs your crew of agents and writes it to files you own. |
 | [`watch`](skills/watch/README.md) | Set the watch: your crew runs on a schedule, writes reports, and leaves decisions for you. |
+| [`chaperone`](skills/chaperone/README.md) | Your agent can go out. It can't pay, post, or text anyone without you. |
 | [`heartbeat`](skills/heartbeat/README.md) | Never wait blind: every wait bounded, checked and reported. |
 | [`bluf`](skills/bluf/README.md) | Decisions, not essays: the answer first, decisions you approve in a word or two, sized to the stakes. |
 | [`receipts`](skills/receipts/README.md) | No claim of done, sent, fixed or ready without where it is and its exact state. |

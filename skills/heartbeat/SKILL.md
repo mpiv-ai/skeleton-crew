@@ -12,7 +12,7 @@ Long work fails quietly. Heartbeat makes every wait short, checked and reported,
 ## The rule
 
 1. **Bound every wait.** Never block for more than about two minutes. Anything longer runs in the background and gets checked.
-2. **Bound the wait, not the work.** Never put a short timeout on the job itself; a healthy job may take an hour. Stop a job only because it stopped making progress.
+2. **Bound the wait, not the work.** Never wrap the job itself in a timeout; a healthy job may take an hour. Stop a job only because it stopped making progress. If you cannot start it in the background, say so and ask how to proceed; never run it in the foreground for more than two minutes.
 3. **Check on a timer.** A monitor that speaks only when new output appears stays silent when the job stalls. Check at fixed intervals, so silence is itself a signal.
 4. **Each check proves progress.** New output, a file that grew, a step that finished. "Still running" is not progress.
 5. **Two checks with no progress means stop.** Do not extend the timeout. Look at why it stalled, then tell the user what stalled and what you changed.

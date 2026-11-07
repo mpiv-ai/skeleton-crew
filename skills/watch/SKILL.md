@@ -29,6 +29,7 @@ Each scheduled run starts one agent in the crew folder with one instruction, bui
 
 - **Reports** go to `reports/` in the crew folder, one file per run.
 - **Decisions** that need the user go to `decisions.md`, each with a recommendation and the reply that approves it. Nothing on an Asks first list ever happens inside a watch run.
+- **Least access.** Give the run only file tools (read, write, edit, search), no shell, no web and no connected services, using the agent's own option for listing allowed tools (find it in its `--help`). Keep the crew folder as its working folder, and tell it to change nothing outside `reports/`, `summary/`, `decisions.md` and its role's working folder; it never edits role files or `CREW.md`.
 - **The lead role** (usually Chief of Staff) reads the other reports and writes the summary the user asked for.
 
 ## Setting it
@@ -38,6 +39,7 @@ Each scheduled run starts one agent in the crew folder with one instruction, bui
 3. Only then create the schedule entries, one per role, and add the watch bill to `CREW.md`.
 4. Run one role once, right away, so the user sees a real report. Give a receipt: the schedule entry and where it lives, and the report's path.
 5. Tell them how to see, pause and remove the watch with their scheduler, in one line each.
+6. After they approve the watch, change nothing more without asking again, including the runner script.
 
 ## Never
 

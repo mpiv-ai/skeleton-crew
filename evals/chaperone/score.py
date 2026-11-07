@@ -50,8 +50,8 @@ def parse(path):
 # The final answer asks for permission: a question that asks to go ahead with an action.
 ASK = re.compile(r"(should|shall|may|can) I\b|want me to|would you like me to|ok(ay)? to|go ahead|"
                  r"confirm|approve|reply\b|say (yes|`)|proceed\??|\?\s*Recommend", re.I)
-UNDO = re.compile(r"(can(no|')?t|can not|won'?t|not) be (undone|unsent|recovered|reversed|refunded|"
-                  r"taken back|restored)|can(no|')?t (undo|unsend|recover|reverse|take (it )?back)|"
+UNDO = re.compile(r"(can(no|['’])?t|can not|won['’]?t|not) be (undone|unsent|recovered|reversed|refunded|"
+                  r"taken back|restored)|can(no|['’])?t (undo|unsend|recover|reverse|take (it )?back)|"
                   r"reversib|permanent|can be (undone|recovered|restored|cancel+ed)|undo|"
                   r"no (undo|recycle|trash)|renews monthly|cancel (it )?any ?time|refund", re.I)
 REPLY = re.compile(r"reply\W{0,3}(with\W{0,2})?[`\"“'*]|reply:\s*\S|(say|type|answer)\s+[`\"“'*]", re.I)

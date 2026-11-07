@@ -1,111 +1,126 @@
 #!/bin/sh
-# Install skeleton-crew skills for every agent on this machine and turn BLUF on.
+# Install skeleton-crew skills for every agent on this machine and turn their rules on.
 # Usage: curl -fsSL https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.sh | sh
 set -eu
 
 npx -y skills add mpiv-ai/skeleton-crew -g "$@"
 
+# --- shared with uninstall.sh: keep identical ---
+# Each skill in blocks.txt keeps the block it adds to an agent's global instructions in
+# skills/<name>/block.md, and every block an earlier release added in skills/<name>/block.previous.md.
+# The rules are inline so they work even when an agent does not load the skill on its own.
+src="${SKELETON_CREW_SOURCE:-https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main}"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
-# The block BLUF adds to each agent's global instructions. The rules are inline so BLUF
-# works even when an agent does not load the skill on its own.
-cat > "$work/new" <<'BLOCK'
-<!-- skeleton-crew:bluf -->
-## BLUF (from skeleton-crew)
-Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
-Bring decisions, not essays. Anything you need from the user (a decision, an approval, or information) goes under "Needs you:" as numbered questions; each gives your recommendation and what happens if they agree, and ends with Reply: `<exact words>`. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.
-After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.
-Separate what you verified from what you infer. Bad news goes in the first line.
-"BLUF:" marks the answer only; progress notes while you work are one plain line without it.
-The bluf skill has the full rules; load it when a reply involves a decision.
-<!-- /skeleton-crew:bluf -->
-BLOCK
-# Every block any release has added, so reinstall and uninstall recognise them. Blocks are separated by %%.
-cat > "$work/known" <<'BLOCK'
-<!-- skeleton-crew:bluf -->
-## BLUF (from skeleton-crew)
-Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
-Bring decisions, not essays. Anything you need from the user (a decision, an approval, or information) goes under "Needs you:" as numbered questions; each gives your recommendation and what happens if they agree, and ends with Reply: `<exact words>`. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.
-After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.
-Separate what you verified from what you infer. Bad news goes in the first line.
-"BLUF:" marks the answer only; progress notes while you work are one plain line without it.
-The bluf skill has the full rules; load it when a reply involves a decision.
-<!-- /skeleton-crew:bluf -->
-%%
-<!-- skeleton-crew:bluf -->
-## BLUF (from skeleton-crew)
-Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
-Bring decisions, not essays: each one is a numbered question with your recommendation, what happens if they agree, and the exact reply that approves it. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.
-After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.
-Separate what you verified from what you infer. Bad news goes in the first line.
-"BLUF:" marks the answer only; progress notes while you work are one plain line without it.
-The bluf skill has the full rules; load it when a reply involves a decision.
-<!-- /skeleton-crew:bluf -->
-%%
-<!-- skeleton-crew:bluf -->
-## BLUF (from skeleton-crew)
-Start every reply with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.
-After it, only what the reader needs: decisions as numbered questions with your recommendation and the exact reply that approves it; up to three "Why:" facts; "Next:" who acts next.
-Keep most replies to about 12 lines. Separate what you verified from what you infer. Bad news goes in the first line.
-The bluf skill has the full rules; load it when a reply involves a decision.
-<!-- /skeleton-crew:bluf -->
-%%
-<!-- skeleton-crew:bluf -->
-Always follow the bluf skill for every reply.
-<!-- /skeleton-crew:bluf -->
-BLOCK
-
-# Print $1 without any exact skeleton-crew block. Exit 2 if a marker is present but the block was edited.
-strip_block() {
-  awk -v kf="$work/known" '
-    BEGIN {
-      nk = 1
-      while ((getline l < kf) > 0) { if (l == "%%") { nk++; continue }; kb[nk, ++kn[nk]] = l }
-      first = kb[1, 1]; last = kb[1, kn[1]]
-    }
-    { a[NR] = $0 }
-    function match_at(i, b,   k) { for (k = 1; k <= kn[b]; k++) if (a[i+k-1] != kb[b, k]) return 0; return 1 }
-    END {
-      for (i = 1; i <= NR; i++) {
-        n = 0
-        for (b = 1; b <= nk && !n; b++) if (match_at(i, b)) n = kn[b]
-        if (n) { if (out > 0 && kept[out] == "") out--; i += n - 1; continue }
-        if (a[i] == first || a[i] == last) exit 2
-        kept[++out] = a[i]
-      }
-      for (j = 1; j <= out; j++) print kept[j]
-    }' "$1"
+fetch() { # <path in repo> <output file>
+  case "$src" in
+    http://*|https://*) curl -fsSL "$src/$1" -o "$2" 2>/dev/null ;;
+    *) cp "$src/$1" "$2" 2>/dev/null ;;
+  esac
 }
 
-# Turn BLUF on only for an agent that is installed and has the skill where it reads skills.
+# Sets $names and writes $work/<name>.new (current block) and $work/known (every block ever added).
+load_blocks() {
+  fetch blocks.txt "$work/list" || { echo "Could not fetch blocks.txt from $src. Nothing changed."; exit 1; }
+  names=""; : > "$work/known"
+  for name in $(grep -v '^#' "$work/list" | tr -d '\r'); do
+    case "$name" in *[!a-z0-9-]*) continue ;; esac
+    fetch "skills/$name/block.md" "$work/$name.new" &&
+      [ "$(head -n 1 "$work/$name.new" | tr -d '\r')" = "<!-- skeleton-crew:$name -->" ] &&
+      [ "$(tail -n 1 "$work/$name.new" | tr -d '\r')" = "<!-- /skeleton-crew:$name -->" ] ||
+      { echo "Could not fetch the $name block from $src. Nothing changed."; exit 1; }
+    fetch "skills/$name/block.previous.md" "$work/$name.old" || : > "$work/$name.old"
+    { cat "$work/$name.new"; echo; cat "$work/$name.old"; echo; } >> "$work/known"
+    names="$names $name"
+  done
+}
+
+# Print the file with every exact known block removed and the blocks in file `af` added at the end,
+# keeping its byte order mark and line endings. Exit 2 (skill name on stderr) if a block was edited,
+# 3 if the file had no known block.
+rewrite_awk='
+  BEGIN {
+    while ((getline l < kf) > 0) {
+      sub(/\r$/, "", l)
+      if (!inb && l ~ /^<!-- skeleton-crew:[a-z0-9-]+ -->$/) {
+        inb = 1; nk++; name = substr(l, 20, length(l) - 23)
+        mark[l] = name; mark["<!-- /skeleton-crew:" name " -->"] = name
+      }
+      if (inb) { kb[nk, ++kn[nk]] = l; if (l == "<!-- /skeleton-crew:" name " -->") inb = 0 }
+    }
+    while (af != "" && (getline l < af) > 0) { sub(/\r$/, "", l); add[++na] = l }
+  }
+  {
+    line = $0
+    if (NR == 1) {
+      if (substr(line, 1, 3) == "\357\273\277") { bom = "\357\273\277"; line = substr(line, 4) }
+      if (line ~ /\r$/) nl = "\r\n"
+    }
+    sub(/\r$/, "", line); a[NR] = line
+  }
+  function match_at(i, b,   k) { for (k = 1; k <= kn[b]; k++) if (a[i+k-1] != kb[b, k]) return 0; return 1 }
+  END {
+    if (nl == "") nl = "\n"
+    for (i = 1; i <= NR; i++) {
+      n = 0
+      for (b = 1; b <= nk && !n; b++) if (match_at(i, b)) n = kn[b]
+      if (n) { if (out > 0 && kept[out] == "") out--; i += n - 1; removed = 1; continue }
+      if (a[i] in mark) { printf "%s", mark[a[i]] > "/dev/stderr"; exit 2 }
+      kept[++out] = a[i]
+    }
+    if (na && out) kept[++out] = ""
+    for (j = 1; j <= na; j++) kept[++out] = add[j]
+    printf "%s", bom
+    for (j = 1; j <= out; j++) printf "%s%s", kept[j], nl
+    exit removed ? 0 : 3
+  }'
+
+# rewrite <file> <blocks to add, or empty>. Writes through a temp file and sets $result to
+# written, unchanged, noblock (nothing to remove, file untouched) or edited:<skill>.
+rewrite() {
+  file="$1"; input="$file"; [ -f "$file" ] || input=/dev/null
+  tmp="$(mktemp "$(dirname "$file")/.skeleton-crew.XXXXXX")"
+  if [ -f "$file" ]; then cp -p "$file" "$tmp"; else chmod "$(printf '%o' $((0666 & ~$(umask))))" "$tmp"; fi
+  rc=0; LC_ALL=C awk -v kf="$work/known" -v af="$2" "$rewrite_awk" "$input" > "$tmp" 2> "$work/err" || rc=$?
+  if [ "$rc" = 2 ]; then result="edited:$(cat "$work/err")"; rm -f "$tmp"; return 0; fi
+  if [ "$rc" != 0 ] && [ "$rc" != 3 ]; then rm -f "$tmp"; echo "Could not read $file. Nothing changed."; exit 1; fi
+  if [ -z "$2" ] && [ "$rc" = 3 ]; then result=noblock; rm -f "$tmp"; return 0; fi
+  if [ -f "$file" ] && cmp -s "$tmp" "$file"; then result=unchanged; rm -f "$tmp"; return 0; fi
+  if [ -L "$file" ]; then cat "$tmp" > "$file"; rm -f "$tmp"; else mv "$tmp" "$file"; fi
+  result=written
+}
+# --- end shared ---
+
+load_blocks
+
+# Turn each skill's rules on only for an agent that is installed and has the skill where it reads skills.
 # If the picker skipped an installed agent, add the skill for it first.
 turn_on() {
-  agent="$1"; file="$2"; skill="$3"
+  agent="$1"; file="$2"; skills="$3"
   [ -d "$(dirname "$file")" ] || return 0
-  if [ ! -f "$skill/SKILL.md" ]; then
-    npx -y skills add mpiv-ai/skeleton-crew -g -a "$agent" --skill bluf -y >/dev/null
-  fi
-  if [ ! -f "$skill/SKILL.md" ]; then
-    echo "Skipped $agent: the bluf skill is not where it reads skills ($skill)."
-    return 0
-  fi
-  if [ -f "$file" ]; then
-    tmp="$(mktemp "$(dirname "$file")/.skeleton-crew.XXXXXX")"
-    if ! strip_block "$file" > "$tmp"; then
-      rm -f "$tmp"
-      echo "Left $file unchanged: its skeleton-crew lines were edited. Remove them by hand, then rerun."
-      return 0
+  : > "$work/add"; on=""
+  for name in $names; do
+    if [ ! -f "$skills/$name/SKILL.md" ]; then
+      npx -y skills add mpiv-ai/skeleton-crew -g -a "$agent" --skill "$name" -y >/dev/null 2>&1 || true
     fi
-  else
-    tmp="$(mktemp "$(dirname "$file")/.skeleton-crew.XXXXXX")"
-  fi
-  { [ -s "$tmp" ] && echo; cat "$work/new"; } >> "$tmp"
-  mv "$tmp" "$file"
-  echo "BLUF on in $file"
+    if [ ! -f "$skills/$name/SKILL.md" ]; then
+      echo "Skipped $name for $agent: the skill is not where it reads skills ($skills/$name)."
+      continue
+    fi
+    [ -s "$work/add" ] && echo >> "$work/add"
+    cat "$work/$name.new" >> "$work/add"
+    on="$on $name"
+  done
+  [ -n "$on" ] || return 0
+  rewrite "$file" "$work/add"
+  case "$result" in
+    edited:*) echo "Left $file unchanged: its skeleton-crew ${result#edited:} lines were edited. Remove them by hand, then rerun." ;;
+    *) echo "On in $file:$on" ;;
+  esac
 }
 
-turn_on claude-code "$HOME/.claude/CLAUDE.md" "$HOME/.claude/skills/bluf"
-turn_on codex "$HOME/.codex/AGENTS.md" "$HOME/.agents/skills/bluf"
+turn_on claude-code "$HOME/.claude/CLAUDE.md" "$HOME/.claude/skills"
+turn_on codex "$HOME/.codex/AGENTS.md" "$HOME/.agents/skills"
 
-echo "Done. To turn BLUF off, run uninstall.sh or delete the skeleton-crew lines in those files."
+echo "Done. To turn them off, run uninstall.sh or delete the skeleton-crew lines in those files."

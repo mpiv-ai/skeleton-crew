@@ -7,7 +7,7 @@ set -eu
 here="$(cd "$(dirname "$0")" && pwd)"; repo="$(dirname "$here")"
 out="${OUT:-$here/results/$(date -u +%Y%m%dT%H%MZ)}"; mkdir -p "$out"   # set OUT to resume a run
 agents="$*"; [ -n "$agents" ] || for a in claude codex pi; do command -v "$a" >/dev/null && agents="$agents $a"; done
-block="$(sed -n "/^cat > \"\$work\/new\" <<'BLOCK'$/,/^BLOCK$/p" "$repo/install.sh" | sed '1d;$d')"
+block="$(cat "$repo/skills/bluf/block.md")"
 
 ask() { # agent dir prompt outfile
   case "$1" in

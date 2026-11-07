@@ -1,51 +1,71 @@
-# Install skeleton-crew skills for every agent on this machine and turn BLUF on.
+# Install skeleton-crew skills for every agent on this machine and turn their rules on.
 # Usage (PowerShell): irm https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.ps1 | iex
 $ErrorActionPreference = 'Stop'
 
 npx -y skills add mpiv-ai/skeleton-crew -g @args
 if ($LASTEXITCODE -ne 0) { throw "skills install failed" }
 
-# The block BLUF adds to each agent's global instructions. The rules are inline so BLUF
-# works even when an agent does not load the skill on its own.
-$NewBlock = @(
-  '<!-- skeleton-crew:bluf -->'
-  '## BLUF (from skeleton-crew)'
-  'Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.'
-  'Bring decisions, not essays. Anything you need from the user (a decision, an approval, or information) goes under "Needs you:" as numbered questions; each gives your recommendation and what happens if they agree, and ends with Reply: `<exact words>`. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.'
-  'After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.'
-  'Separate what you verified from what you infer. Bad news goes in the first line.'
-  '"BLUF:" marks the answer only; progress notes while you work are one plain line without it.'
-  'The bluf skill has the full rules; load it when a reply involves a decision.'
-  '<!-- /skeleton-crew:bluf -->'
-)
-$Block3 = @(
-  '<!-- skeleton-crew:bluf -->'
-  '## BLUF (from skeleton-crew)'
-  'Start every answer with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.'
-  'Bring decisions, not essays: each one is a numbered question with your recommendation, what happens if they agree, and the exact reply that approves it. Routine choices get one line; spending, sending, deleting, or anything irreversible gets the full brief.'
-  'After that, at most three "Why:" facts and a "Next:" line. Keep most replies to about 12 lines.'
-  'Separate what you verified from what you infer. Bad news goes in the first line.'
-  '"BLUF:" marks the answer only; progress notes while you work are one plain line without it.'
-  'The bluf skill has the full rules; load it when a reply involves a decision.'
-  '<!-- /skeleton-crew:bluf -->'
-)
-# Blocks earlier releases added; reinstall replaces them and uninstall removes them.
-$Block2 = @(
-  '<!-- skeleton-crew:bluf -->'
-  '## BLUF (from skeleton-crew)'
-  'Start every reply with a line that begins "BLUF:" and gives the answer, outcome, or verdict in one sentence. No greeting, no preamble.'
-  'After it, only what the reader needs: decisions as numbered questions with your recommendation and the exact reply that approves it; up to three "Why:" facts; "Next:" who acts next.'
-  'Keep most replies to about 12 lines. Separate what you verified from what you infer. Bad news goes in the first line.'
-  'The bluf skill has the full rules; load it when a reply involves a decision.'
-  '<!-- /skeleton-crew:bluf -->'
-)
-
-$Block1 = @(
-  '<!-- skeleton-crew:bluf -->'
-  'Always follow the bluf skill for every reply.'
-  '<!-- /skeleton-crew:bluf -->'
-)
+# --- shared with uninstall.ps1: keep identical ---
+# Each skill in blocks.txt keeps the block it adds to an agent's global instructions in
+# skills/<name>/block.md, and every block an earlier release added in skills/<name>/block.previous.md.
+# The rules are inline so they work even when an agent does not load the skill on its own.
+$Source = 'https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main'
+if ($env:SKELETON_CREW_SOURCE) { $Source = $env:SKELETON_CREW_SOURCE }
+$ProgressPreference = 'SilentlyContinue'
 $Utf8 = New-Object System.Text.UTF8Encoding $false
+
+function Get-SourceText([string]$Path, [switch]$Optional) {
+  try {
+    if ($Source -match '^https?://') {
+      $c = (Invoke-WebRequest -UseBasicParsing -Uri "$Source/$Path").Content
+      if ($c -is [byte[]]) { $c = $Utf8.GetString($c) }
+      return [string]$c
+    }
+    return [System.IO.File]::ReadAllText([System.IO.Path]::Combine($Source, $Path))
+  } catch {
+    if ($Optional) { return '' }
+    throw "Could not fetch $Path from $Source. Nothing changed."
+  }
+}
+
+# Lines without line endings or a byte order mark.
+function Split-Lines([string]$Text) {
+  if ($Text.Length -gt 0 -and $Text[0] -eq [char]0xFEFF) { $Text = $Text.Substring(1) }
+  if ($Text.Length -eq 0) { return ,@() }
+  $parts = $Text -split "`n"
+  if ($Text.EndsWith("`n")) { $parts = $parts[0..($parts.Count - 2)] }
+  return ,@($parts | ForEach-Object { $_.TrimEnd("`r") })
+}
+
+# Each skeleton-crew block in $Lines, as an array of lines.
+function Get-Blocks([string[]]$Lines) {
+  $blocks = New-Object System.Collections.Generic.List[object]
+  $cur = $null; $end = $null
+  foreach ($l in $Lines) {
+    if ($null -eq $cur -and $l -cmatch '^<!-- skeleton-crew:([a-z0-9-]+) -->$') {
+      $cur = New-Object System.Collections.Generic.List[string]; $end = "<!-- /skeleton-crew:$($Matches[1]) -->"
+    }
+    if ($null -ne $cur) {
+      $cur.Add($l)
+      if ($l -ceq $end) { $blocks.Add([string[]]$cur.ToArray()); $cur = $null }
+    }
+  }
+  return ,$blocks
+}
+
+$Names = New-Object System.Collections.Generic.List[string]
+$Current = New-Object 'System.Collections.Generic.Dictionary[string,object]'
+$Known = New-Object System.Collections.Generic.List[object]
+$Markers = New-Object 'System.Collections.Generic.Dictionary[string,string]'
+foreach ($n in (Split-Lines (Get-SourceText 'blocks.txt'))) {
+  $n = $n.Trim()
+  if ($n -cnotmatch '^[a-z0-9-]+$') { continue }
+  $cur = Get-Blocks (Split-Lines (Get-SourceText "skills/$n/block.md"))
+  if ($cur.Count -ne 1 -or $cur[0][0] -cne "<!-- skeleton-crew:$n -->") { throw "Could not fetch the $n block from $Source. Nothing changed." }
+  $Names.Add($n); $Current[$n] = $cur[0]; $Known.Add($cur[0])
+  foreach ($b in (Get-Blocks (Split-Lines (Get-SourceText "skills/$n/block.previous.md" -Optional)))) { $Known.Add($b) }
+  $Markers["<!-- skeleton-crew:$n -->"] = $n; $Markers["<!-- /skeleton-crew:$n -->"] = $n
+}
 
 function Test-BlockAt([string[]]$Lines, [int]$At, [string[]]$Block) {
   if ($At + $Block.Count -gt $Lines.Count) { return $false }
@@ -53,54 +73,71 @@ function Test-BlockAt([string[]]$Lines, [int]$At, [string[]]$Block) {
   return $true
 }
 
-# Returns the file's lines without any exact skeleton-crew block, or $null if a marker is present but the block was edited.
-function Remove-Block([string]$File) {
-  $lines = @()
-  if (Test-Path -LiteralPath $File) { $lines = @([System.IO.File]::ReadAllLines($File)) }
+# Rewrite $File with every exact known block removed and $Add (lines, may be empty) added at the end,
+# keeping its byte order mark and line endings. Writes through a temp file. Returns
+# 'written', 'unchanged', 'noblock' (nothing to remove, file untouched) or 'edited:<skill>'.
+function Update-Blocks([string]$File, [string[]]$Add) {
+  $bytes = New-Object byte[] 0
+  if (Test-Path -LiteralPath $File) { $bytes = [System.IO.File]::ReadAllBytes($File) }
+  $bom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+  $skip = 0; if ($bom) { $skip = 3 }
+  $text = $Utf8.GetString($bytes, $skip, $bytes.Length - $skip)
+  $nl = "`n"; $i = $text.IndexOf("`n"); if ($i -gt 0 -and $text[$i - 1] -eq "`r") { $nl = "`r`n" }
+  $lines = Split-Lines $text
   $kept = New-Object System.Collections.Generic.List[string]
+  $removed = $false
   for ($i = 0; $i -lt $lines.Count; $i++) {
     $n = 0
-    foreach ($kb in @($NewBlock, $Block3, $Block2, $Block1)) { if ($n -eq 0 -and (Test-BlockAt $lines $i $kb)) { $n = $kb.Count } }
+    foreach ($kb in $Known) { if ($n -eq 0 -and (Test-BlockAt $lines $i $kb)) { $n = $kb.Count } }
     if ($n -gt 0) {
       if ($kept.Count -gt 0 -and $kept[$kept.Count - 1] -eq '') { $kept.RemoveAt($kept.Count - 1) }
-      $i += $n - 1; continue
+      $i += $n - 1; $removed = $true; continue
     }
-    if ($lines[$i] -ceq $NewBlock[0] -or $lines[$i] -ceq $NewBlock[$NewBlock.Count - 1]) { return $null }
+    if ($Markers.ContainsKey($lines[$i])) { return "edited:$($Markers[$lines[$i]])" }
     $kept.Add($lines[$i])
   }
-  return ,$kept
-}
-
-function Write-Lines([string]$File, $Lines) {
-  $text = ''
-  if ($Lines.Count -gt 0) { $text = ($Lines -join "`n") + "`n" }
+  if ($Add.Count -eq 0 -and -not $removed) { return 'noblock' }
+  if ($Add.Count -gt 0 -and $kept.Count -gt 0) { $kept.Add('') }
+  foreach ($l in $Add) { $kept.Add($l) }
+  $out = ''; if ($kept.Count -gt 0) { $out = ($kept -join $nl) + $nl }
+  $new = $Utf8.GetBytes($out)
+  if ($bom) { $new = [byte[]]((0xEF, 0xBB, 0xBF) + $new) }
+  if ((Test-Path -LiteralPath $File) -and [Convert]::ToBase64String($new) -ceq [Convert]::ToBase64String($bytes)) { return 'unchanged' }
+  $item = $null; if (Test-Path -LiteralPath $File) { $item = Get-Item -LiteralPath $File -Force }
+  if ($item -and $item.LinkType) { [System.IO.File]::WriteAllBytes($File, $new); return 'written' }
   $tmp = [System.IO.Path]::Combine(([System.IO.Path]::GetDirectoryName($File)), '.skeleton-crew.' + [guid]::NewGuid().ToString('N'))
-  [System.IO.File]::WriteAllText($tmp, $text, $Utf8)
+  [System.IO.File]::WriteAllBytes($tmp, $new)
   Move-Item -LiteralPath $tmp -Destination $File -Force
+  return 'written'
 }
+# --- end shared ---
 
-# Turn BLUF on only for an agent that is installed and has the skill where it reads skills.
+# Turn each skill's rules on only for an agent that is installed and has the skill where it reads skills.
 # If the picker skipped an installed agent, add the skill for it first.
-function Enable-Bluf([string]$Agent, [string]$File, [string]$Skill) {
+function Enable-Blocks([string]$Agent, [string]$File, [string]$Skills) {
   if (-not (Test-Path -LiteralPath ([System.IO.Path]::GetDirectoryName($File)))) { return }
-  $skillFile = [System.IO.Path]::Combine($Skill, 'SKILL.md')
-  if (-not (Test-Path -LiteralPath $skillFile)) {
-    npx -y skills add mpiv-ai/skeleton-crew -g -a $Agent --skill bluf -y | Out-Null
+  $add = New-Object System.Collections.Generic.List[string]; $on = @()
+  foreach ($n in $Names) {
+    $skillFile = [System.IO.Path]::Combine($Skills, $n, 'SKILL.md')
+    if (-not (Test-Path -LiteralPath $skillFile)) {
+      npx -y skills add mpiv-ai/skeleton-crew -g -a $Agent --skill $n -y | Out-Null
+    }
+    if (-not (Test-Path -LiteralPath $skillFile)) {
+      Write-Host "Skipped $n for ${Agent}: the skill is not where it reads skills ($([System.IO.Path]::Combine($Skills, $n)))."; continue
+    }
+    if ($add.Count -gt 0) { $add.Add('') }
+    foreach ($l in $Current[$n]) { $add.Add($l) }
+    $on += $n
   }
-  if (-not (Test-Path -LiteralPath $skillFile)) {
-    Write-Host "Skipped ${Agent}: the bluf skill is not where it reads skills ($Skill)."; return
+  if ($on.Count -eq 0) { return }
+  $result = Update-Blocks $File $add.ToArray()
+  if ($result -like 'edited:*') {
+    Write-Host "Left $File unchanged: its skeleton-crew $($result.Substring(7)) lines were edited. Remove them by hand, then rerun."; return
   }
-  $kept = Remove-Block $File
-  if ($null -eq $kept) {
-    Write-Host "Left $File unchanged: its skeleton-crew lines were edited. Remove them by hand, then rerun."; return
-  }
-  if ($kept.Count -gt 0) { $kept.Add('') }
-  foreach ($l in $NewBlock) { $kept.Add($l) }
-  Write-Lines $File $kept
-  Write-Host "BLUF on in $File"
+  Write-Host "On in ${File}: $($on -join ' ')"
 }
 
-Enable-Bluf 'claude-code' ([System.IO.Path]::Combine($HOME, '.claude', 'CLAUDE.md')) ([System.IO.Path]::Combine($HOME, '.claude', 'skills', 'bluf'))
-Enable-Bluf 'codex' ([System.IO.Path]::Combine($HOME, '.codex', 'AGENTS.md')) ([System.IO.Path]::Combine($HOME, '.agents', 'skills', 'bluf'))
+Enable-Blocks 'claude-code' ([System.IO.Path]::Combine($HOME, '.claude', 'CLAUDE.md')) ([System.IO.Path]::Combine($HOME, '.claude', 'skills'))
+Enable-Blocks 'codex' ([System.IO.Path]::Combine($HOME, '.codex', 'AGENTS.md')) ([System.IO.Path]::Combine($HOME, '.agents', 'skills'))
 
-Write-Host 'Done. To turn BLUF off, run uninstall.ps1 or delete the skeleton-crew lines in those files.'
+Write-Host 'Done. To turn them off, run uninstall.ps1 or delete the skeleton-crew lines in those files.'

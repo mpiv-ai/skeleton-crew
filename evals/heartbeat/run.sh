@@ -8,7 +8,10 @@
 # Our own global instructions, hooks, extensions and skills are switched off.
 # Each agent runs in its own process namespace with its own /tmp (bubblewrap), so it cannot
 # see the other runs, their files, or this script in the process list. The lock holder stays outside, as an unknown process would.
-# Needs bwrap (bubblewrap). Usage: evals/heartbeat/run.sh [claude] [pi]    (OUT=dir to resume, LIMIT=seconds per run, REPS=n)
+# Pi also gets a read-only filesystem apart from its folder, /tmp and its own settings.
+# HEARTBEAT_GATE=realistic lets Pi use nohup, setsid and bash -c wrappers around ./job.sh (see gate.ts).
+# Needs bwrap (bubblewrap). Usage: evals/heartbeat/run.sh [claude] [pi]
+#   OUT=dir to resume, LIMIT=seconds per run, REPS=n, CONDS="on" to skip the heartbeat-off runs
 set -u
 here=$(cd "$(dirname "$0")" && pwd); repo=$(cd "$here/../.." && pwd)
 block=$repo/skills/heartbeat/block.md
@@ -34,6 +37,8 @@ run() { # agent cond task rep
       --allowedTools "Read,TaskStop,Bash(./job.sh:*),Bash(sleep:*)" \
       < /dev/null 2>&1 | python3 "$here/stamp.py" > "$f.jsonl")
   else
+    box=(bwrap --ro-bind / / --dev /dev --tmpfs /tmp --bind "$d" "$d" --bind "$HOME/.pi" "$HOME/.pi" \
+      --unshare-pid --proc /proc --die-with-parent)
     on=(); [ "$2" = on ] && on=(--append-system-prompt "$d/AGENTS.md" --skill "$d/.claude/skills/heartbeat")
     (set -o pipefail; cd "$d" && timeout "$limit" "${box[@]}" pi -p --mode json --no-session -nc -ns -ne --no-mcp \
       -e "$here/gate.ts" -t read,bash "${on[@]}" "$ask" < /dev/null 2>&1 | python3 "$here/stamp.py" > "$f.jsonl")
@@ -49,7 +54,7 @@ run() { # agent cond task rep
 }
 
 for rep in $(seq 1 "${REPS:-1}"); do
-  for agent in $agents; do for cond in off on; do for t in slow stall; do
+  for agent in $agents; do for cond in ${CONDS:-off on}; do for t in slow stall; do
     run "$agent" "$cond" "$t" "$rep" &
   done; done; done
 done

@@ -1,39 +1,44 @@
 ---
 name: receipts
-description: Never claim something is done, saved, sent, fixed, ready or working without saying where it is and its exact state. Use for every reply that reports progress or a result.
+description: Never claim work is done without showing where it is and what state it is in. Use whenever you are about to tell the user something is done, saved, sent, fixed, installed, deployed, published, ready or verified.
 ---
 
 # Receipts
 
 *Part of skeleton-crew from MPIV Labs. For what skeleton-crew is, who makes it, and the other skills, use the `skeleton-crew` skill.*
 
-Every claim of progress comes with a receipt: where the thing is, and exactly what state it is in. If you cannot say where it is, do not claim it.
+Every claim that something is done comes with a receipt: where it is, and its exact state. If you cannot give the receipt, do not make the claim.
 
-## The rule
+## The receipt
 
-Whenever you say something is **done, saved, written, created, sent, submitted, posted, deployed, fixed, installed, ready, working or verified**, give:
+**Where:** something the user can open or check.
+- A link or URL.
+- A file path, with a line number when it matters.
+- An ID with its place: a draft ID with the mailbox and subject, a commit hash with the repository, an issue number with the tracker.
 
-1. **Where:** a link, a file path (with a line number when it helps), a commit, a draft's mailbox and subject, a URL, or an ID.
-2. **Exact state**, in these words:
-   - *text written in* `<file>` — nothing else done with it
-   - *draft saved in* `<place>` — not sent
-   - *form filled, not submitted*
-   - *submitted* / *sent* / *posted* — and to where
-   - *committed* / *pushed* / *merged* / *deployed* — and to which branch or place
-   - *verified* — by which check, and what it returned
+**State:** exactly one of these, in these words:
+- **written:** text exists in a file; nothing was sent or entered anywhere else.
+- **saved as draft:** in a mailbox or app, not sent.
+- **filled, not submitted:** a form is complete and waiting for Submit.
+- **submitted** or **sent:** it left; say to whom or where.
+- **committed** or **pushed:** say the repository and branch.
+- **installed** or **deployed:** say where it runs.
+- **verified:** say the check you ran and what it returned.
 
-## Words that need a receipt
+## Rules
 
-- **"Ready"** means the user can act on it now. For a web form, that means it is filled in and waiting for them to press Submit. If only the text exists, say "text written in `<file>`; nothing entered on the site."
-- **"Fixed"** or **"working"** means you ran something that shows it. Name the check and its result. If you only changed the code, say "changed, not yet tested."
-- **"Done"** means the thing the user asked for exists where they will look for it. Merged is not done if it is not installed.
+1. **No receipt, no claim.** "It's ready" with nowhere to look becomes "Text written in `notes/plan.md`; not sent."
+2. **Say the weaker state when in doubt.** Written is not sent. Committed is not deployed. Deployed is not verified.
+3. **A check you ran beats a check you assume.** "Tests pass" needs the command and its result. If you did not run it, say "not run".
+4. **Someone else's report is not your receipt.** If another agent or tool told you it is done, say so: "Reported done by the build bot; I have not checked."
+5. **Partial work gets a partial receipt.** "Steps 1 and 2 done (`setup.sh` ran, exit 0); step 3 not started."
 
-## When you cannot give a receipt
+## Examples
 
-Say what you did instead, plainly: "I wrote the email text below; I have not saved it as a draft." If the claim cannot be located, drop it.
-
-## Example
-
-> **Without a receipt:** Done! I've updated the config and the email is ready.
+> **Without receipts:** I've drafted the email and it's ready to go.
 >
-> **With receipts:** Config changed in `app/config.yaml:14` (timeout 30 → 60); not yet tested. Email text written in `drafts/welcome.md`; not saved to your mailbox, nothing sent.
+> **With receipts:** Draft saved in Gmail (michael@example.com), subject "Q3 numbers"; not sent.
+
+> **Without receipts:** Fixed the bug and deployed.
+>
+> **With receipts:** Fix committed as `a1b2c3d` on `main` in `acme/api` and deployed to staging; production not deployed. Verified on staging: `curl /health` returned 200.

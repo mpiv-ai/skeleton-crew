@@ -1,18 +1,12 @@
-# Receipts
+# receipts
 
-No claim without a receipt. When your agent says something is done, saved, sent, fixed or ready, it also says where it is and its exact state: "text written in `notes.md`; nothing sent", "draft saved in Gmail, not sent", "fixed: the test now passes".
+Your agent can't say "done" without showing you where it is and what state it's in.
+
+"I drafted the email and it's ready" becomes "Draft saved in Gmail, subject 'Q3 numbers'; not sent." Written is not sent, committed is not deployed, and a check the agent didn't run doesn't count.
 
 ## What changes
 
-- **Every claim is located.** A link, file path, commit, URL or ID.
-- **Every claim has a state.** Written, saved as a draft, submitted, sent, committed, deployed, verified, in plain words.
-- **"Fixed" and "working" need a check.** Otherwise it says "changed, not yet tested".
-- **No receipt, no claim.** If it can't say where something is, it doesn't claim it.
-
-## Does it work?
-
-See [evals/receipts/RESULTS.md](../../evals/receipts/RESULTS.md). A real-work test shows it catches "fixed" claims made without testing.
-
-## Install
-
-It comes with skeleton-crew; see the [main README](../../README.md#install).
+- **Every done comes with a receipt:** a link, a file path, or an ID you can check.
+- **Exact states:** written, saved as draft, filled but not submitted, sent, committed, deployed, verified.
+- **The weaker state wins** when the agent isn't sure.
+- **Other people's reports are labelled** as reports, not as facts the agent checked.

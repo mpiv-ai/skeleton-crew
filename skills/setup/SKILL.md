@@ -17,7 +17,18 @@ Use these three terms, and define each the first time it comes up:
 
 Newcomers start with a lab agent. Offer independent agents and workbenches only when the user asks for model choice, local models, or running several agents at once.
 
-## 1. Three questions, one at a time
+## 1. Look before you ask
+
+Never ask what you can find out. If you can run commands, check first, quietly, then say in one line what you found:
+
+- **System:** you already know it from your environment.
+- **Agents installed:** look for `claude`, `codex`, `grok`, `agy`, `pi`, `omp` and `bb` (`command -v` on Mac or Linux, `Get-Command` on Windows).
+- **skeleton-crew:** run the check script (step 4) and read its result.
+- **You are one of the agents.** If you are running inside Claude Code, Codex or another agent, the user already has that lab's account and a terminal. Do not ask whether they pay for it or can use a terminal.
+
+Then ask only what is still unknown, one question at a time. Usually that is one question: what do they want next (another lab agent, an independent agent, skeleton-crew, or nothing)?
+
+Ask these only when you cannot check, for example in a chat app with no access to their computer:
 
 1. "Do you already pay for an AI subscription? (Claude, ChatGPT, Grok or SuperGrok, Google AI Pro or Ultra, or none)"
 2. "Are you on Mac, Windows or Linux?"
@@ -25,7 +36,7 @@ Newcomers start with a lab agent. Offer independent agents and workbenches only 
 
 If they already pay for one, recommend that lab's agent: it costs nothing extra to try. If they pay for none, recommend the lab whose chat app they already like, and tell them that lab's current plan prices are on its website; do not quote prices from memory.
 
-## 2. Open a terminal (skip if they have used one)
+## 2. Open a terminal (skip if they are already in one)
 
 - Mac: press Command and Space, type Terminal, press Return.
 - Windows: press the Windows key, type PowerShell, press Enter.

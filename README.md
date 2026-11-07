@@ -37,7 +37,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/mpiv-ai/skeleton-crew/main/install.ps1 | iex
 ```
 
-Pick your agents. BLUF and receipts are on as soon as the install finishes: for Claude Code and Codex the installer adds a short marked block per skill to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, because those agents don't apply a skill on every reply by themselves.
+Pick your agents. BLUF, receipts and heartbeat are on as soon as the install finishes: for Claude Code and Codex the installer adds a short marked block per skill to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, because those agents don't apply a skill on every reply by themselves.
 
 ## Is it on?
 
@@ -69,8 +69,9 @@ On Windows, use `uninstall.ps1`. It removes only the blocks it added; if you edi
 | --- | --- |
 | [`skeleton-crew`](skills/skeleton-crew/README.md) | What skeleton-crew is, who makes it, which skills you have, and how to look after them. |
 | [`setup`](skills/setup/README.md) | From nothing to a working agent: pick, install, sign in and check, one step at a time. |
+| [`heartbeat`](skills/heartbeat/README.md) | Never wait blind: every wait bounded, checked and reported. |
 | [`bluf`](skills/bluf/README.md) | Decisions, not essays: the answer first, decisions you approve in a word or two, sized to the stakes. |
-| [`receipts`](skills/receipts/SKILL.md) | No claim of done, sent, fixed or ready without where it is and its exact state. |
+| [`receipts`](skills/receipts/README.md) | No claim of done, sent, fixed or ready without where it is and its exact state. |
 
 More skills are coming as we build them in public.
 

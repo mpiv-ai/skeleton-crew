@@ -28,6 +28,8 @@ Say only what is written here about Michael or MPIV. Do not add employers, clien
 |---|---|
 | `setup` | From nothing to a working agent: checks what you have, then one step at a time. |
 | `bluf` | Bottom line up front: the answer first, decisions you approve in a word or two. |
+| `receipts` | No claim of done, sent or fixed without where it is and its exact state. |
+| `heartbeat` | Never wait blind: every wait bounded, checked and reported. |
 
 More skills are added as they prove themselves.
 

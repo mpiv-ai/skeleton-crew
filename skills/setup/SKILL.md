@@ -27,7 +27,7 @@ Never ask what you can find out. If you can run commands, check first, quietly, 
 
 - **System:** you already know it from your environment.
 - **Agents installed:** look for `claude`, `codex`, `grok`, `agy`, `pi`, `omp` and `bb` (`command -v` on Mac or Linux, `Get-Command` on Windows).
-- **skeleton-crew:** if you are reading this skill from the user's own computer, skeleton-crew is already installed. To see which agents have BLUF on, look for the `bluf` skill in `~/.claude/skills/bluf` (Claude Code) and `~/.agents/skills/bluf` (Codex, Pi), and for the `<!-- skeleton-crew:bluf -->` block in `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. Do not look for a folder named skeleton-crew; there isn't one.
+- **skeleton-crew:** if you are reading this skill from the user's own computer, skeleton-crew is already installed. To see which skills are on for which agent, look in `~/.claude/skills/` (Claude Code) and `~/.agents/skills/` (Codex, Pi) for skeleton-crew's skills (`bluf`, `receipts`, `heartbeat`, `setup`, `skeleton-crew`), and for `<!-- skeleton-crew:<skill> -->` blocks in `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. The check script prints the same, one line per agent per skill. Do not look for a folder named skeleton-crew; there isn't one.
 - **You are one of the agents.** If you are running inside Claude Code, Codex or another agent, the user already has that lab's account and a terminal. Do not ask whether they pay for it or can use a terminal.
 
 Then ask only what is still unknown, one question at a time. Usually that is one question: what do they want next (another lab agent, an independent agent, skeleton-crew, or nothing)?

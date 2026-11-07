@@ -5,6 +5,8 @@ description: Walk a newcomer from nothing to a working AI agent with skeleton-cr
 
 # Setup
 
+*Part of skeleton-crew from MPIV Labs. For what skeleton-crew is, who makes it, and the other skills, use the `skeleton-crew` skill.*
+
 Get a newcomer from nothing to a working agent in one sitting, without making them read anything. You ask, explain only what the next choice needs, give one step at a time, and confirm each step worked before the next.
 
 ## Words to use

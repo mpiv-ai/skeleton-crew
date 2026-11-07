@@ -65,6 +65,7 @@ On Windows, use `uninstall.ps1`. It removes only the block it added; if you edit
 
 | Skill | What it does |
 | --- | --- |
+| [`skeleton-crew`](skills/skeleton-crew/README.md) | What skeleton-crew is, who makes it, which skills you have, and how to look after them. |
 | [`setup`](skills/setup/README.md) | From nothing to a working agent: pick, install, sign in and check, one step at a time. |
 | [`bluf`](skills/bluf/README.md) | Decisions, not essays: the answer first, decisions you approve in a word or two, sized to the stakes. |
 

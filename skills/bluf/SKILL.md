@@ -5,6 +5,8 @@ description: Decision-ready answers. Your agent leads with the answer and hands 
 
 # BLUF
 
+*Part of skeleton-crew from MPIV Labs. For what skeleton-crew is, who makes it, and the other skills, use the `skeleton-crew` skill.*
+
 Bottom line up front. The reader gets the answer in the first line, can stop reading at any point without missing anything they must act on, and can approve any decision with the one reply you give them.
 
 ## The shape

@@ -1,9 +1,11 @@
 ---
-name: crew
-description: Interview the user like a management consultant and design their crew of AI agents, one role per recurring job, then write the crew to plain files they own. Use when the user asks to set up a crew, a team of agents, an AI staff, or help deciding what agents should do for them.
+name: muster
+description: Muster your crew. Interview the user like a management consultant and design their crew of AI agents, one role per recurring job, then write the crew to plain files they own. Use when the user says muster, or asks to set up a crew, a team of agents, an AI staff, or help deciding what agents should do for them.
 ---
 
-# Crew interview
+# Muster
+
+To muster is to gather a ship's crew and call the roll.
 
 *Part of skeleton-crew from MPIV Labs. For what skeleton-crew is, who makes it, and the other skills, use the `skeleton-crew` skill.*
 

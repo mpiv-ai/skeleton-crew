@@ -1,4 +1,7 @@
-# Crew interview
+# Muster
+
+Muster your crew. (To muster is to gather a ship's crew and call the roll.)
+
 
 Your agent interviews you like a management consultant, then designs a small crew of AI agents around the work that keeps coming back: one role per recurring job, three to five roles, each with clear limits.
 
@@ -12,4 +15,4 @@ Every role reports in BLUF form, gives receipts, and keeps heartbeat on long wor
 
 ## Try it
 
-After installing skeleton-crew, tell your agent: "Interview me and set up my crew."
+After installing skeleton-crew, tell your agent: "Muster my crew."

@@ -30,7 +30,7 @@ Say only what is written here about Michael or MPIV. Do not add employers, clien
 | `bluf` | Bottom line up front: the answer first, decisions you approve in a word or two. |
 | `receipts` | No claim of done, sent or fixed without where it is and its exact state. |
 | `heartbeat` | Never wait blind: every wait bounded, checked and reported. |
-| `crew` | A consultant's intake interview that designs your crew of agents and writes it to files you own. |
+| `muster` | Muster your crew: a consultant's intake interview that designs your crew of agents and writes it to files you own. |
 
 More skills are added as they prove themselves.
 
